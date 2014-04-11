@@ -96,7 +96,7 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     }
     
     public void setScale( double newScale ) {
-        System.out.println( "setting scale");
+        //System.out.println( "setting scale");
         scale = newScale;
         repaint();
     }
@@ -117,6 +117,15 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     public void resetOrigin() {
         origin = new Point( 0, 0 );
         repaint();
+    }
+    
+    public void setColor( Color newColor ) {
+        form.setColor(newColor);
+        repaint();
+    }
+    
+    public Color getColor() {
+        return form.getColor();
     }
     
     private Coordinate getMax( ArrayList list )
@@ -237,4 +246,5 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     public void mouseExited( MouseEvent e ) {
         
     }
+
 }

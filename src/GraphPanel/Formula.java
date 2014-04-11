@@ -159,46 +159,14 @@ public abstract class Formula extends Object
       return newcoord;
       }
    
-   public void setA( double newParam ) {
-       Params[0] = newParam;
+   public void setParam( int index, double newParam ) {
+       Params[index] = newParam;
    }
    
-   public void setB( double newParam ) {
-       Params[1] = newParam;
+   public double getParam( int index ) {
+       return Params[index];
    }
-   
-   public void setC( double newParam ) {
-       Params[2] = newParam;
-   }
-   
-   public void setD( double newParam ) {
-       Params[3] = newParam;
-   }
-   
-   public void setE( double newParam ) {
-       Params[4] = newParam;
-   }
-   
-   public double getA() {
-       return Params[0];
-   }
-   
-   public double getB() {
-       return Params[1];
-   }
-   
-   public double getC() {
-       return Params[2];
-   }
-   
-   public double getD() {
-       return Params[3];
-   }
-   
-   public double getE() {
-       return Params[4];
-   }
-   
+
    public String getLabel() {
        return label;
    }
