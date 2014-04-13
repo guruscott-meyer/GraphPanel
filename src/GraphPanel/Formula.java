@@ -1,6 +1,7 @@
 package GraphPanel;
 
 import java.awt.Color;
+import java.beans.*;
 
 public abstract class Formula extends Object
    {
@@ -8,6 +9,8 @@ public abstract class Formula extends Object
    protected double[] Params;
    private Color color;
    protected String label;
+   
+   private final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
 
    public Formula()
       {
@@ -22,8 +25,18 @@ public abstract class Formula extends Object
       color = Color.black;
       }
 
+   public void addPropertyChangeListener( PropertyChangeListener listener ) {
+       pcs.addPropertyChangeListener( listener );
+   }
+   
+   public void removePropertyChangeListener( PropertyChangeListener listener ) {
+       pcs.removePropertyChangeListener( listener );
+   }
+   
    public void setColor( Color newColor ) {
+       Color oldColor = color;
        color = newColor;
+       pcs.firePropertyChange( "color", oldColor, newColor);
    }
    
    public Color getColor() {
@@ -31,7 +44,9 @@ public abstract class Formula extends Object
    }
    
    public void setParams( double[] params ) {
+       double[] oldParams = Params;
        Params = params;
+       pcs.firePropertyChange( "Params", oldParams, params );
    }
    
    public double[] getParams()
@@ -160,7 +175,9 @@ public abstract class Formula extends Object
       }
    
    public void setParam( int index, double newParam ) {
+       double oldParam = Params[index];
        Params[index] = newParam;
+       pcs.firePropertyChange( "Params", oldParam, newParam );
    }
    
    public double getParam( int index ) {

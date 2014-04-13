@@ -12,12 +12,13 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.event.*;
 import javax.swing.*;
+import java.beans.*;
 
 /**
  *
  * @author Scott Meyer
  */
-public class GraphPanel extends JPanel implements MouseInputListener{
+public class GraphPanel extends JPanel implements MouseInputListener, PropertyChangeListener{
     
     static final int SCALE_MULT = 2;
     static final int POINT_SIZE = 4;
@@ -34,6 +35,8 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     private static boolean plotting;
     
     private static Point oldLocation;
+    
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     
     public GraphPanel() {
         
@@ -54,12 +57,14 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     private void init() {
         addMouseListener( this );
         addMouseMotionListener( this );
+        addPropertyChangeListener( this );
     }
     
     public void setPlotList ( ArrayList newList ) 
     {
+        ArrayList oldList = plotList;
         plotList = newList;
-        repaint();
+        firePropertyChange( "plotList", oldList, newList );
     }
     
     public ArrayList getPlotList() {
@@ -68,8 +73,10 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     
     public void setFormula( Formula newform )
          {
+         Formula oldform = form;
          form = newform;
-         repaint();
+         form.addPropertyChangeListener(this);
+         firePropertyChange( "form", oldform, form );
          }
     
     public Formula getFormula()
@@ -79,7 +86,9 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     
     public void setGraphing( boolean newgraphing )
          {
+         boolean oldGraphing = graphing;
 	 graphing = newgraphing;
+         firePropertyChange( "graphing", oldGraphing, graphing );
 	 }
 
     public boolean isGraphing()
@@ -88,7 +97,9 @@ public class GraphPanel extends JPanel implements MouseInputListener{
 	 }
 
     public void setPlotting( boolean newplotting ) {
+        boolean oldPlotting = plotting;
         plotting = newplotting;
+        firePropertyChange( "plotting", oldPlotting, plotting );
     }
     
     public boolean isPlotting() {
@@ -96,9 +107,9 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     }
     
     public void setScale( double newScale ) {
-        //System.out.println( "setting scale");
+        double oldScale = scale;
         scale = newScale;
-        repaint();
+        firePropertyChange( "scale", oldScale, scale );
     }
     
     public double getScale() {
@@ -106,8 +117,9 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     }
        
     public void setOrigin( Point newOrigin ) {
+        Point oldOrigin = origin;
         origin = newOrigin;
-        repaint();
+        firePropertyChange( "origin", oldOrigin, origin );
     }
     
     public Point getOrigin() {
@@ -115,13 +127,11 @@ public class GraphPanel extends JPanel implements MouseInputListener{
     }
     
     public void resetOrigin() {
-        origin = new Point( 0, 0 );
-        repaint();
+        setOrigin( new Point( 0, 0 ) );
     }
     
     public void setColor( Color newColor ) {
         form.setColor(newColor);
-        repaint();
     }
     
     public Color getColor() {
@@ -207,6 +217,11 @@ public class GraphPanel extends JPanel implements MouseInputListener{
                         j + 1, getHeight() - new Double(form.getY(new Integer( j + 1 ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue());
 	    }
 	 }
+    
+    @Override
+    public void propertyChange( PropertyChangeEvent e )  {
+        repaint();
+    }
     
     @Override
     public void mouseDragged( MouseEvent e ) {
