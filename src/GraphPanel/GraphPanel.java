@@ -27,10 +27,10 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
     static final int MARK_LENGTH = 10;
     //static final Integer RESOLUTION = 100;
     
-    private static ArrayList<Coordinate> plotList;
+    private static Coordinate[] plotList;
+    private static Formula[] formList;
     private static double scale;
     private static Point origin;
-    private static Formula form;
     private static boolean graphing;
     private static boolean plotting;
     
@@ -60,29 +60,52 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
         addPropertyChangeListener( this );
     }
     
-    public void setPlotList ( ArrayList newList ) 
+    public void setPlotList ( Coordinate[] newList ) 
     {
-        ArrayList oldList = plotList;
+        Coordinate[] oldList = plotList;
         plotList = newList;
-        firePropertyChange( "plotList", oldList, newList );
+        firePropertyChange( "plotList", oldList, plotList );
     }
     
-    public ArrayList getPlotList() {
+    public Coordinate[] getPlotList() {
         return plotList;
     }
     
-    public void setFormula( Formula newform )
+    public void setCoordinate ( Coordinate newCoord, int index ) {
+        Coordinate[] oldList = plotList;
+        plotList[index] = newCoord;
+        firePropertyChange( "plotList", oldList, plotList );
+    }
+    
+    public Coordinate getCoordinate ( int index ) {
+        return plotList[index];
+    }
+    
+    public void setFormList( Formula[] newList )
          {
-         Formula oldform = form;
-         form = newform;
-         form.addPropertyChangeListener(this);
-         firePropertyChange( "form", oldform, form );
+         Formula[] oldList = formList;
+         formList = newList;
+         for (Formula formList1 : formList) {
+            formList1.addPropertyChangeListener(this);
+            }
+         firePropertyChange( "formList", oldList, formList );
          }
     
-    public Formula getFormula()
+    public Formula[] getFormList()
          {
-         return form;
+         return formList;
          }
+    
+    public void setFormula( Formula newForm, int index ) {
+        Formula[] oldList = formList;
+        formList[index] = newForm;
+        formList[index].addPropertyChangeListener(this);
+        firePropertyChange( "formList", oldList, formList );
+    }
+    
+    public Formula getFormula( int index ) {
+        return formList[index];
+    }
     
     public void setGraphing( boolean newgraphing )
          {
@@ -130,20 +153,12 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
         setOrigin( new Point( 0, 0 ) );
     }
     
-    public void setColor( Color newColor ) {
-        form.setColor(newColor);
-    }
-    
-    public Color getColor() {
-        return form.getColor();
-    }
-    
-    private Coordinate getMax( ArrayList list )
+    private Coordinate getMax( Coordinate[] list )
       {
       try
          {
-         TreeSet temp = new TreeSet( list );
-         return (Coordinate) temp.last();
+         Arrays.sort( list  );
+         return list[ list.length - 1 ];
 	 }
       catch( NoSuchElementException nsee )
          {
@@ -151,12 +166,12 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
 	 }
       }
 
-   private Coordinate getMin( ArrayList list )
+   private Coordinate getMin( Coordinate[] list )
       {
       try
          {
-         TreeSet temp = new TreeSet( list );
-         return (Coordinate) temp.first();
+         Arrays.sort( list );
+         return list[0];
 	 }
       catch( NoSuchElementException nsee )
          {
@@ -180,12 +195,12 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
 
          //Marks on the grid lines
          //x axis marks
-	 for( int i = -origin.x + origin.x % ( getWidth() / NUM_MARKS ); i < getWidth() - origin.x; i += getWidth() / 10 ) {
+	 for( int i = -origin.x + origin.x % ( getWidth() / NUM_MARKS ); i < getWidth() - origin.x; i += getWidth() / NUM_MARKS ) {
 	    g.drawLine( i, getHeight() + MARK_LENGTH, i, getHeight() - MARK_LENGTH );
             //System.out.println( origin.x % 10 );
          }
          //y axis marks
-	 for( int i = -origin.y + origin.y % ( getHeight() / NUM_MARKS ); i < getHeight() - origin.y; i += getHeight() / 10 )
+	 for( int i = -origin.y + origin.y % ( getHeight() / NUM_MARKS ); i < getHeight() - origin.y; i += getHeight() / NUM_MARKS )
 	    g.drawLine( MARK_LENGTH, i, -MARK_LENGTH, i );
 
          //Labels to indicate scale
@@ -198,25 +213,21 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
          
          //Plot the points
          if( plotting && plotList != null ) {
-             Coordinate max = getMax( plotList );
-             while( scale < max.getX() || scale < max.getY() )
-                scale *= SCALE_MULT;
-             plotList.stream().forEach((plotList1) -> {
-             g.fillRect(new Double( plotList1.getX() * new Integer(getHeight()).doubleValue() / scale ).intValue() - POINT_SIZE / 2,
-                    getHeight() - new Double( plotList1.getY() * new Integer(getHeight()).doubleValue() / scale ).intValue() - POINT_SIZE / 2,
-                    POINT_SIZE, POINT_SIZE);
-             });
+             for (Coordinate plotList1 : plotList) {
+                 g.fillRect(new Double(plotList1.getX() * new Integer(getHeight()).doubleValue() / scale).intValue() - POINT_SIZE / 2, getHeight() - new Double(plotList1.getY() * new Integer(getHeight()).doubleValue() / scale).intValue() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
+             }
          }
 
          //draw the graph
-         if( graphing && form != null )
-	    {
-	    g.setColor( form.getColor() );
-	    for( int j = -origin.x; j < getWidth() - 1; j++ )
-                g.drawLine(j, getHeight() - new Double(form.getY(new Integer( j ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue(),
-                        j + 1, getHeight() - new Double(form.getY(new Integer( j + 1 ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue());
-	    }
-	 }
+         if( graphing && formList != null ) {
+            for( Formula form : formList ) {
+                g.setColor( form.getColor() );
+                for( int j = -origin.x; j < getWidth() - origin.x; j++ )
+                    g.drawLine(j, getHeight() - new Double(form.getY(new Integer( j ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue(),
+                            j + 1, getHeight() - new Double(form.getY(new Integer( j + 1 ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue());
+                }
+            }
+         }
     
     @Override
     public void propertyChange( PropertyChangeEvent e )  {
