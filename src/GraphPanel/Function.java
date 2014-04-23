@@ -3,7 +3,7 @@ package GraphPanel;
 import java.awt.Color;
 import java.beans.*;
 
-public abstract class Formula extends Object
+public abstract class Function extends Object
    {
 
    protected double[] Params;
@@ -12,13 +12,13 @@ public abstract class Formula extends Object
    
    private final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
 
-   public Formula()
+   public Function()
       {
       label = new String();
       color = Color.black;
       }
 
-   public Formula( double[] params )
+   public Function( double[] params )
       {
       Params = params;
       label = new String();
@@ -181,7 +181,8 @@ public abstract class Formula extends Object
    }
    
    public double getParam( int index ) {
-       return Params[index];
+       if( index >= Params.length ) return 0.0;
+       else return Params[index];
    }
 
    public String getLabel() {

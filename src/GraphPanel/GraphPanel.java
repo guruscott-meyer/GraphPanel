@@ -27,8 +27,8 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
     static final int MARK_LENGTH = 10;
     //static final Integer RESOLUTION = 100;
     
-    private static Coordinate[] plotList;
-    private static Formula[] formList;
+    private static ArrayList<Coordinate> plotList;
+    private static ArrayList<Function> funcList;
     private static double scale;
     private static Point origin;
     private static boolean graphing;
@@ -60,51 +60,51 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
         addPropertyChangeListener( this );
     }
     
-    public void setPlotList ( Coordinate[] newList ) 
+    public void setPlotList ( ArrayList<Coordinate> newList ) 
     {
-        Coordinate[] oldList = plotList;
+        ArrayList<Coordinate> oldList = plotList;
         plotList = newList;
         firePropertyChange( "plotList", oldList, plotList );
     }
     
-    public Coordinate[] getPlotList() {
+    public ArrayList<Coordinate> getPlotList() {
         return plotList;
     }
     
     public void setCoordinate ( Coordinate newCoord, int index ) {
-        Coordinate[] oldList = plotList;
-        plotList[index] = newCoord;
-        firePropertyChange( "plotList", oldList, plotList );
+        Coordinate oldCoord = plotList.get( index );
+        plotList.set( index, newCoord );
+        firePropertyChange( "plotList", oldCoord, newCoord );
     }
     
     public Coordinate getCoordinate ( int index ) {
-        return plotList[index];
+        return plotList.get( index );
     }
     
-    public void setFormList( Formula[] newList )
+    public void setFunctionList( ArrayList<Function> newList )
          {
-         Formula[] oldList = formList;
-         formList = newList;
-         for (Formula formList1 : formList) {
-            formList1.addPropertyChangeListener(this);
+         ArrayList<Function> oldList = funcList;
+         funcList = newList;
+         for (Function function : funcList) {
+            function.addPropertyChangeListener(this);
             }
-         firePropertyChange( "formList", oldList, formList );
+         firePropertyChange( "formList", oldList, funcList );
          }
     
-    public Formula[] getFormList()
+    public ArrayList<Function> getFunctionList()
          {
-         return formList;
+         return funcList;
          }
     
-    public void setFormula( Formula newForm, int index ) {
-        Formula[] oldList = formList;
-        formList[index] = newForm;
-        formList[index].addPropertyChangeListener(this);
-        firePropertyChange( "formList", oldList, formList );
+    public void setFunction( Function newFunc, int index ) {
+        Function oldFunc = funcList.get( index );
+        funcList.set( index, newFunc );
+        funcList.get( index ).addPropertyChangeListener(this);
+        firePropertyChange( "formList", oldFunc, newFunc );
     }
     
-    public Formula getFormula( int index ) {
-        return formList[index];
+    public Function getFunction( int index ) {
+        return funcList.get( index );
     }
     
     public void setGraphing( boolean newgraphing )
@@ -219,12 +219,12 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
          }
 
          //draw the graph
-         if( graphing && formList != null ) {
-            for( Formula form : formList ) {
-                g.setColor( form.getColor() );
+         if( graphing && funcList != null ) {
+            for( Function func : funcList ) {
+                g.setColor( func.getColor() );
                 for( int j = -origin.x; j < getWidth() - origin.x; j++ )
-                    g.drawLine(j, getHeight() - new Double(form.getY(new Integer( j ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue(),
-                            j + 1, getHeight() - new Double(form.getY(new Integer( j + 1 ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue());
+                    g.drawLine(j, getHeight() - new Double(func.getY(new Integer( j ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue(),
+                            j + 1, getHeight() - new Double(func.getY(new Integer( j + 1 ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue());
                 }
             }
          }
