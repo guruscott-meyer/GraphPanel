@@ -8,20 +8,17 @@ public abstract class Function extends Object
 
    protected double[] Params;
    private Color color;
-   protected String label;
    
-   private final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
+   protected final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
 
    public Function()
       {
-      label = new String();
       color = Color.black;
       }
 
-   public Function( double[] params )
+   protected Function( double[] params )
       {
       Params = params;
-      label = new String();
       color = Color.black;
       }
 
@@ -181,13 +178,15 @@ public abstract class Function extends Object
    }
    
    public double getParam( int index ) {
-       if( index >= Params.length ) return 0.0;
+       if( Params == null || index < 0 || index >= Params.length ) return 0.0;
        else return Params[index];
    }
 
-   public String getLabel() {
-       return label;
+   public int getParamCount() {
+       return 0;
    }
+   
+   public abstract String getLabel();
 
    public abstract double getY( double x );
 
