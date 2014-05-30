@@ -28,7 +28,7 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
     //static final Integer RESOLUTION = 100;
     
     private static ArrayList<Coordinate> plotList;
-    private static ArrayList<Function> funcList;
+    private static ArrayList<FunctionFramework> funcList;
     private static double scale;
     private static Point origin;
     private static boolean graphing;
@@ -81,29 +81,25 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
         return plotList.get( index );
     }
     
-    public void setFunctionList( ArrayList<Function> newList )
+    public void setFunctionList( ArrayList<FunctionFramework> newList )
          {
-         ArrayList<Function> oldList = funcList;
+         ArrayList<FunctionFramework> oldList = funcList;
          funcList = newList;
-         for (Function function : funcList) {
-            function.addPropertyChangeListener(this);
-            }
          firePropertyChange( "formList", oldList, funcList );
          }
     
-    public ArrayList<Function> getFunctionList()
+    public ArrayList<FunctionFramework> getFunctionList()
          {
          return funcList;
          }
     
-    public void setFunction( Function newFunc, int index ) {
-        Function oldFunc = funcList.get( index );
+    public void setFunction( FunctionFramework newFunc, int index ) {
+        FunctionFramework oldFunc = funcList.get( index );
         funcList.set( index, newFunc );
-        funcList.get( index ).addPropertyChangeListener(this);
         firePropertyChange( "formList", oldFunc, newFunc );
     }
     
-    public Function getFunction( int index ) {
+    public FunctionFramework getFunction( int index ) {
         return funcList.get( index );
     }
     
@@ -220,7 +216,7 @@ public class GraphPanel extends JPanel implements MouseInputListener, PropertyCh
 
          //draw the graph
          if( graphing && funcList != null ) {
-            for( Function func : funcList ) {
+            for( FunctionFramework func : funcList ) {
                 g.setColor( func.getColor() );
                 for( int j = -origin.x; j < getWidth() - origin.x; j++ )
                     g.drawLine(j, getHeight() - new Double(func.getY(new Integer( j ).doubleValue() / new Integer( getWidth() ).doubleValue() * scale ) * getHeight() / scale ).intValue(),
